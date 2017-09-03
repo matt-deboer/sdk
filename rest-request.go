@@ -35,7 +35,7 @@ var DefaultHTTPClient = http.DefaultClient
 
 // Client uses Grafana REST API for interacting with Grafana server.
 type Client struct {
-	baseURL   *url.URL
+	baseURL   string
 	key       string
 	basicAuth bool
 	client    *http.Client
@@ -53,7 +53,7 @@ type StatusMessage struct {
 // NewClient initializes client for interacting with an instance of Grafana server.
 func NewClient(apiURL, apiKeyOrBasicAuth string, client *http.Client) *Client {
 	key := ""
-	basicAuth := strings.Contains(apiKeyOrBasicAuth, ":"))
+	basicAuth := strings.Contains(apiKeyOrBasicAuth, ":")
 	baseURL, _ := url.Parse(apiURL)
 	if !basicAuth {
 		key = fmt.Sprintf("Bearer %s", apiKeyOrBasicAuth)
@@ -91,7 +91,7 @@ func (r *Client) doRequest(method, query string, params url.Values, buf io.Reade
 		u.RawQuery = params.Encode()
 	}
 	req, err := http.NewRequest(method, u.String(), buf)
-	if !basicAuth {
+	if !r.basicAuth {
 		req.Header.Set("Authorization", r.key)
 	}
 	req.Header.Set("Accept", "application/json")
